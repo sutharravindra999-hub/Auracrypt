@@ -1,112 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auracrypt - Secure Biometric Portal</title>
+    <title>ऑरक्रिप्ट बायोमेट्रिक सुरक्षा</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; background: #0f172a; color: #fff; }
-        .container { max-width: 600px; margin: auto; padding: 25px; background: #1e293b; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        .lang-search-box { margin-bottom: 20px; }
-        input[type="text"] { padding: 10px 14px; font-size: 15px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; width: 80%; outline: none; }
-        input[type="text"]:focus { border-color: #38bdf8; }
-        select { padding: 10px 14px; font-size: 16px; border-radius: 6px; cursor: pointer; background: #334155; color: #fff; border: 1px solid #475569; width: 85%; margin-top: 10px; }
-        h1 { font-size: 24px; margin-top: 25px; color: #38bdf8; }
-        p { font-size: 16px; color: #cbd5e1; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* मुख्य स्क्रीन (कैमरा और वॉइस कमांड वाला हिस्सा) */
+        .main-container {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 450px;
+            background: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* पॉप-अप मोडल ओवरले */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #38bdf8;
+        }
+
+        #langSearch {
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: white;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+
+        .language-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        .language-list label {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 6px;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+
+        .language-list label:hover {
+            background: #475569;
+        }
+
+        #okButton {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #okButton:hover {
+            background: #1d4ed8;
+        }
+
+        .options-box {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="lang-search-box">
-            <label style="display:block; margin-bottom: 8px; font-weight: bold;">🔍 Search & Select Language / भाषा खोजें:</label>
-            <input type="text" id="langSearch" onkeyup="filterLanguages()" placeholder="Type to search language...">
-            <br>
-            <select id="languageSelect" size="5" onchange="changeLanguage(this.value)">
-                <option value="en" selected>English</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="gu">ગુજરાતી (Gujarati)</option>
-                <option value="fr">Français (French)</option>
-                <option value="es">Español (Spanish)</option>
-                <option value="ar">العربية (Arabic)</option>
-                <option value="de">Deutsch (German)</option>
-                <option value="ru">Русский (Russian)</option>
-                <option value="zh">中文 (Chinese)</option>
-                <option value="ja">日本語 (Japanese)</option>
-            </select>
-        </div>
+    <!-- भाषा चयन पॉप-अप (Modal) -->
+    <div id="languageModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>🔍 Search & Select Language / भाषा खोजें:</h3>
+            <input type="text" id="langSearch" placeholder="Type to search language..." onkeyup="filterLanguages()">
+            
+            <div id="langList" class="language-list">
+                <label><input type="radio" name="language" value="en" checked> English</label>
+                <label><input type="radio" name="language" value="hi"> हिन्दी (Hindi)</label>
+                <label><input type="radio" name="language" value="gu"> ગુજરાતી (Gujarati)</label>
+                <label><input type="radio" name="language" value="fr"> Français (French)</label>
+                <label><input type="radio" name="language" value="es"> Español (Spanish)</label>
+                <label><input type="radio" name="language" value="ar"> العربية (Arabic)</label>
+                <label><input type="radio" name="language" value="de"> Deutsch (German)</label>
+            </div>
 
-        <h1 id="welcomeText">Welcome to Auracrypt Biometric Security</h1>
-        <p id="descText">Please authenticate using your IR Camera or Voice Command.</p>
+            <!-- OK बटन जो पॉप-अप को बंद करके पीछे का पेज दिखाएगा -->
+            <button type="button" id="okButton" onclick="closeLanguageModal()">OK</button>
+        </div>
+    </div>
+
+    <!-- मुख्य स्क्रीन (कैमरा और वॉइस कमांड) -->
+    <div class="main-container">
+        <h2>ऑरक्रिप्ट बायोमेट्रिक सुरक्षा में आपका स्वागत है</h2>
+        <p>कृपया अपने IR कैमरे या वॉइस कमांड का उपयोग करके प्रमाणीकरण करें।</p>
+        
+        <div class="options-box">
+            <button class="action-btn">📷 कैमरा शुरू करें</button>
+            <button class="action-btn">🎙️ वॉइस कमांड</button>
+        </div>
     </div>
 
     <script>
-        const translations = {
-            en: { 
-                welcome: "Welcome to Auracrypt Biometric Security", 
-                desc: "Please authenticate using your IR Camera or Voice Command." 
-            },
-            hi: { 
-                welcome: "ऑरक्रिप्ट बायोमेट्रिक सुरक्षा में आपका स्वागत है", 
-                desc: "कृपया अपने IR कैमरे या वॉइस कमांड का उपयोग करके प्रमाणीकरण करें।" 
-            },
-            gu: { 
-                welcome: "Auracrypt બાયોમેટ્રિક સુરક્ષામાં આપનું સ્વાગત છે", 
-                desc: "કૃપા કરીને તમારા IR કેમેરા અથવા વૉઇસ કમાન્ડનો ઉપયોગ કરીને પ્રમાણીકરણ કરો." 
-            },
-            fr: { 
-                welcome: "Bienvenue sur la sécurité biométrique Auracrypt", 
-                desc: "Veuillez vous authentifier à l'aide de votre caméra IR ou de votre commande vocale." 
-            },
-            es: { 
-                welcome: "Bienvenido a la seguridad biométrica de Auracrypt", 
-                desc: "Por favor autentíquese usando su cámara IR o comando de voz." 
-            },
-            ar: { 
-                welcome: "مرحباً بك في أمان الأوراكريبت البيومتري", 
-                desc: "الرجاء المصادقة باستخدام كاميرا الأشعة تحت الحمراء أو الأوامر الصوتية." 
-            },
-            de: { 
-                welcome: "Willkommen bei der Auracrypt Biometriesicherheit", 
-                desc: "Bitte authentifizieren Sie sich mit Ihrer IR-Kamera oder Ihrem Sprachbefehl." 
-            },
-            ru: { 
-                welcome: "Добро пожаловать в биометрическую систему безопасности Auracrypt", 
-                desc: "Пожалуйста, пройдите аутентификацию с помощью ИК-камеры или голосовой команды." 
-            },
-            zh: { 
-                welcome: "欢迎使用 Auracrypt 生物识别安全", 
-                desc: "请使用红外摄像头或语音命令进行身份验证。" 
-            },
-            ja: { 
-                welcome: "Auracrypt 生体認証セキュリティへようこそ", 
-                desc: "IRカメラまたは音声コマンドを使用して認証してください。" 
-            }
-        };
+        // OK बटन पर क्लिक करने पर चलने वाला फंक्शन
+        function closeLanguageModal() {
+            // चुनी गई भाषा का मान प्राप्त करें
+            const selectedLang = document.querySelector('input[name="language"]:checked').value;
+            console.log("चयनित भाषा:", selectedLang);
 
+            // पॉप-अप बॉक्स को स्क्रीन से पूरी तरह छुपा दें
+            document.getElementById('languageModal').style.display = 'none';
+        }
+
+        // भाषाओं को सर्च/फिल्टर करने का फंक्शन
         function filterLanguages() {
-            const input = document.getElementById('langSearch').value.toLowerCase();
-            const select = document.getElementById('languageSelect');
-            const options = select.getElementsByTagName('option');
-            for (let i = 0; i < options.length; i++) {
-                const txtValue = options[i].textContent || options[i].innerText;
-                options[i].style.display = txtValue.toLowerCase().indexOf(input) > -1 ? "" : "none";
+            let input = document.getElementById('langSearch').value.toLowerCase();
+            let labels = document.getElementById('langList').getElementsByTagName('label');
+            
+            for (let i = 0; i < labels.length; i++) {
+                let txt = labels[i].textContent || labels[i].innerText;
+                if (txt.toLowerCase().indexOf(input) > -1) {
+                    labels[i].style.display = "";
+                } else {
+                    labels[i].style.display = "none";
+                }
             }
         }
-
-        function changeLanguage(lang) {
-            if (translations[lang]) {
-                document.getElementById("welcomeText").innerText = translations[lang].welcome;
-                document.getElementById("descText").innerText = translations[lang].desc;
-                localStorage.setItem("preferredLang", lang);
-            }
-        }
-
-        window.onload = function() {
-            const savedLang = localStorage.getItem("preferredLang") || "en";
-            document.getElementById("languageSelect").value = savedLang;
-            changeLanguage(savedLang);
-        };
     </script>
 </body>
 </html>
