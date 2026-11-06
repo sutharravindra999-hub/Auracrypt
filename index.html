@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,37 +22,15 @@
         .dashboard { background: #064e3b; text-align: center; }
         .radio-group { background: #334155; padding: 10px; border-radius: 6px; margin-top: 8px; text-align: left; }
         .radio-group label { display: inline; color: #fff; margin-left: 5px; cursor: pointer; }
-        
-        #langModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.95); display: flex; justify-content: center; align-items: center;
-            z-index: 9999;
-        }
-        .lang-card {
-            background: #1e293b; padding: 25px; border-radius: 12px; text-align: center; width: 90%; max-width: 380px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5); border: 1px solid #334155;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Language / Mode Selection Modal -->
-    <div id="langModal">
-        <div class="lang-card">
-            <h2 id="modalTitle">Select Interface Mode</h2>
-            <select id="appLangSelect" style="margin-top: 15px;">
-                <option value="en">English Standard</option>
-                <option value="hi">Divine Roman / Hindi Mode</option>
-            </select>
-            <button id="langOkBtn" style="background: #16a34a; margin-top: 20px;">OK</button>
-        </div>
-    </div>
-
     <!-- 1. Login Section -->
     <div class="container" id="loginSection">
-        <h2 id="txtHeader">Secure Biometric & Divine Voice Portal</h2>
+        <h2>Secure Biometric & Divine Voice Portal</h2>
         
-        <label id="txtCamLabel" for="cameraSelect">Select Camera / External Iris Scanner:</label>
+        <label for="cameraSelect">Select Camera / External Iris Scanner:</label>
         <select id="cameraSelect">
             <option value="">Searching cameras...</option>
         </select>
@@ -60,7 +38,7 @@
         <video id="videoElement" autoplay playsinline muted></video>
 
         <div class="voice-box">
-            <label id="txtVoiceLabel">Speak clearly into mic (Security Code):</label>
+            <label>Speak clearly into mic (Security Code):</label>
             <div class="god-name" id="targetWord">Loading...</div>
             <button id="listenBtn" style="background: #16a34a; margin-top: 10px;">Verify with Divine Voice</button>
             <p id="voiceStatus" style="font-size: 13px; color: #94a3b8; margin-top: 5px;">Status: Waiting</p>
@@ -101,43 +79,6 @@
     <script>
         const cashfree = Cashfree({ mode: "sandbox" });
 
-        const translations = {
-            en: {
-                modalTitle: "Select Interface Mode",
-                langOkBtn: "OK",
-                txtHeader: "Secure Biometric & Divine Voice Portal",
-                txtCamLabel: "Select Camera / External Iris Scanner:",
-                startCamBtn: "Start Camera",
-                txtVoiceLabel: "Speak clearly into mic (Security Code):",
-                listenBtn: "Verify with Divine Voice"
-            },
-            hi: {
-                modalTitle: "Divine Mode Selected",
-                langOkBtn: "OK / Proceed",
-                txtHeader: "Secure Biometric & Divine Voice Portal",
-                txtCamLabel: "Select Camera / External Iris Scanner:",
-                startCamBtn: "Start Camera",
-                txtVoiceLabel: "Speak clearly into mic (Security Code):",
-                listenBtn: "Verify with Divine Voice"
-            }
-        };
-
-        const langModal = document.getElementById('langModal');
-        const appLangSelect = document.getElementById('appLangSelect');
-        const langOkBtn = document.getElementById('langOkBtn');
-
-        langOkBtn.addEventListener('click', () => {
-            const selectedLang = appLangSelect.value;
-            document.getElementById('modalTitle').innerText = translations[selectedLang].modalTitle;
-            document.getElementById('langOkBtn').innerText = translations[selectedLang].langOkBtn;
-            document.getElementById('txtHeader').innerText = translations[selectedLang].txtHeader;
-            document.getElementById('txtCamLabel').innerText = translations[selectedLang].txtCamLabel;
-            document.getElementById('startCamBtn').innerText = translations[selectedLang].startCamBtn;
-            document.getElementById('txtVoiceLabel').innerText = translations[selectedLang].txtVoiceLabel;
-            document.getElementById('listenBtn').innerText = translations[selectedLang].listenBtn;
-            langModal.style.display = 'none';
-        });
-
         const cameraSelect = document.getElementById('cameraSelect');
         const startCamBtn = document.getElementById('startCamBtn');
         const videoElement = document.getElementById('videoElement');
@@ -150,7 +91,7 @@
         const pricingSection = document.getElementById('pricingSection');
         const dashboardSection = document.getElementById('dashboardSection');
         const payNowBtn = document.getElementById('payNowBtn');
-        const activePlanName = document.getElementById('activePlanName');
+        const activePlanName = document.php; // fallback
 
         let currentStream = null;
 
@@ -228,7 +169,8 @@
                     spokenText.includes("ganesh") || spokenText.includes("mata") || spokenText.includes("hanuman") || 
                     spokenText.includes("narayan") || spokenText.includes("mahakal") || spokenText.includes("ganga") || 
                     spokenText.includes("om") || spokenText.includes("jai") || spokenText.includes("radhe") || 
-                    spokenText.includes("shyam") || spokenText.includes("bappa") || spokenText.includes("vishnu")) {
+                    spokenText.includes("shyam") || spokenText.includes("bappa") || spokenText.includes("vishnu") ||
+                    spokenText.includes("surya") || spokenText.includes("devta") || spokenText.includes("bholenath")) {
                     
                     voiceStatus.innerText = "Divine Voice Authentication Successful!";
                     voiceStatus.style.color = "#4ade80";
@@ -260,9 +202,6 @@
             if (selectedModel === 'usage') {
                 amountToPay = 2; 
                 planDesc = "Pay-As-You-Go Model";
-                activePlanName.innerText = "Pay-As-You-Go Model";
-            } else {
-                activePlanName.innerText = "Monthly Fixed Package";
             }
 
             alert("Selected Plan: " + planDesc + " | Amount: INR " + amountToPay + "\nCashfree payment gateway integrated successfully!");
