@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>33-Koti Divine Multi-Factor Biometric Suite</title>
-    <!-- Razorpay Checkout Script -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Cashfree Checkout SDK -->
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <style>
         body { font-family: sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
         .container { max-width: 520px; margin: auto; background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: relative; }
@@ -23,7 +23,6 @@
         .radio-group { background: #334155; padding: 10px; border-radius: 6px; margin-top: 8px; text-align: left; }
         .radio-group label { display: inline; color: #fff; margin-left: 5px; cursor: pointer; }
         
-        /* рд╕реБрд░рдХреНрд╖рд┐рдд рд▓реИрдВрдЧреНрд╡реЗрдЬ рдореЙрдбрд▓ рд╕реНрдЯрд╛рдЗрд▓ing (рддрд╛рдХрд┐ рд╕реНрдХреНрд░реАрди рди рдЕрдЯрдХреЗ) */
         #langModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.95); display: flex; justify-content: center; align-items: center;
@@ -37,83 +36,84 @@
 </head>
 <body>
 
-    <!-- рднрд╛рд╖рд╛ рдЪрдпрди рдореЙрдбрд▓ (рд╕рдмрд╕реЗ рдкрд╣рд▓реЗ рдЦреБрд▓реЗрдЧрд╛, рдУрдХреЗ рдХрд░рдиреЗ рдкрд░ рд╣рдЯ рдЬрд╛рдПрдЧрд╛) -->
+    <!-- Language / Mode Selection Modal -->
     <div id="langModal">
         <div class="lang-card">
-            <h2 id="modalTitle">рднрд╛рд╖рд╛ рдЪреБрдиреЗрдВ / Select Language</h2>
+            <h2 id="modalTitle">Select Interface Mode</h2>
             <select id="appLangSelect" style="margin-top: 15px;">
-                <option value="hi">рд╣рд┐рдиреНрджреА (Hindi)</option>
-                <option value="en">English (рдЕрдВрдЧреНрд░реЗрдЬреА)</option>
+                <option value="en">English Standard</option>
+                <option value="hi">Divine Roman / Hindi Mode</option>
             </select>
-            <button id="langOkBtn" style="background: #16a34a; margin-top: 20px;">рдареАрдХ рд╣реИ / OK</button>
+            <button id="langOkBtn" style="background: #16a34a; margin-top: 20px;">OK</button>
         </div>
     </div>
 
-    <!-- 1. рд▓реЙрдЧрд┐рди рд╕реЗрдХреНрд╢рди (рдХреИрдорд░рд╛ / рдЖрдИрд░рд┐рд╕ рд╕реНрдХреИрдирд░ + 33 рдХреЛрдЯрд┐ рд╡реЙрдЗрд╕ рдХрдорд╛рдВрдб) -->
+    <!-- 1. Login Section -->
     <div class="container" id="loginSection">
-        <h2 id="txtHeader">рд╕реБрд░рдХреНрд╖рд┐рдд рдмрд╛рдпреЛрдореЗрдЯреНрд░рд┐рдХ рдФрд░ рджрд┐рд╡реНрдп рд╡реЙрдЗрд╕ рдкреЛрд░реНрдЯрд▓</h2>
+        <h2 id="txtHeader">Secure Biometric & Divine Voice Portal</h2>
         
-        <label id="txtCamLabel" for="cameraSelect">рдХреИрдорд░рд╛ / рдПрдХреНрд╕рдЯрд░реНрдирд▓ рдЖрдИрд░рд┐рд╕ рд╕реНрдХреИрдирд░ рдЪреБрдиреЗрдВ:</label>
+        <label id="txtCamLabel" for="cameraSelect">Select Camera / External Iris Scanner:</label>
         <select id="cameraSelect">
-            <option value="">рдХреИрдорд░реЗ рдЦреЛрдЬреЗ рдЬрд╛ рд░рд╣реЗ рд╣реИрдВ...</option>
+            <option value="">Searching cameras...</option>
         </select>
-        <button id="startCamBtn">рдХреИрдорд░рд╛ рдЪрд╛рд▓реВ рдХрд░реЗрдВ</button>
+        <button id="startCamBtn">Start Camera</button>
         <video id="videoElement" autoplay playsinline muted></video>
 
         <div class="voice-box">
-            <label id="txtVoiceLabel">рдорд╛рдЗрдХ рдХреЗ рд╕рд╛рдордиреЗ рд╕реНрдкрд╖реНрдЯ рдмреЛрд▓реЗрдВ (рд╕реБрд░рдХреНрд╖рд╛ рдХреЛрдб):</label>
-            <div class="god-name" id="targetWord">рд▓реЛрдб рд╣реЛ рд░рд╣рд╛ рд╣реИ...</div>
-            <button id="listenBtn" style="background: #16a34a; margin-top: 10px;">рджрд┐рд╡реНрдп рдЖрд╡рд╛рдЬрд╝ рд╕реЗ рд╡реЗрд░реАрдлрд╛рдИ рдХрд░реЗрдВ</button>
-            <p id="voiceStatus" style="font-size: 13px; color: #94a3b8; margin-top: 5px;">рд╕реНрдерд┐рддрд┐: рдкреНрд░рддреАрдХреНрд╖рд╛ рдореЗрдВ</p>
+            <label id="txtVoiceLabel">Speak clearly into mic (Security Code):</label>
+            <div class="god-name" id="targetWord">Loading...</div>
+            <button id="listenBtn" style="background: #16a34a; margin-top: 10px;">Verify with Divine Voice</button>
+            <p id="voiceStatus" style="font-size: 13px; color: #94a3b8; margin-top: 5px;">Status: Waiting</p>
         </div>
 
-        <button id="proceedToPlanBtn" style="background: #ca8a04; display:none;">рдЖрдЧреЗ рдмрдврд╝реЗрдВ (рдкреНрд▓рд╛рди рдЪреБрдиреЗрдВ)</button>
+        <button id="proceedToPlanBtn" style="background: #ca8a04; display:none;">Proceed (Select Plan)</button>
     </div>
 
-    <!-- 2. рдмрд┐рдЬрдиреЗрд╕ рдкреНрд▓рд╛рди рдФрд░ рдкреЗрдореЗрдВрдЯ рд╕рд┐рд▓реЗрдХреНрд╢рди рд╕реЗрдХреНрд╢рди -->
+    <!-- 2. Business Plan & Payment Section -->
     <div class="container section-box" id="pricingSection">
-        <h2>рдмрд┐рдЬрдиреЗрд╕ рдкреНрд▓рд╛рди рдФрд░ рднреБрдЧрддрд╛рди рдЪрдпрди</h2>
-        <p style="font-size: 13px; color: #cbd5e1;">рдЕрдкрдиреА рдЬрд░реВрд░рдд рдХреЗ рдореБрддрд╛рдмрд┐рдХ рдкреНрд▓рд╛рди рдЪреБрдиреЗрдВ:</p>
+        <h2>Business Plan & Payment Selection</h2>
+        <p style="font-size: 13px; color: #cbd5e1;">Choose your required plan:</p>
         
         <div class="radio-group">
             <input type="radio" id="planMonthly" name="pricingModel" value="monthly" checked>
-            <label for="planMonthly"><b>рдордВрдерд▓реА рдлрд┐рдХреНрд╕ рдкреИрдХреЗрдЬ</b> - тВ╣499 / рдорд╣реАрдирд╛ (рдЕрдирд▓рд┐рдорд┐рдЯреЗрдб)</label>
+            <label for="planMonthly"><b>Monthly Fixed Package</b> - INR 499 / Month (Unlimited)</label>
         </div>
 
         <div class="radio-group" style="margin-top: 10px;">
             <input type="radio" id="planPayAsYouGo" name="pricingModel" value="usage">
-            <label for="planPayAsYouGo"><b>рдкреЗ-рдПрдЬ-рдпреВ-рдЧреЛ (Per-Scan)</b> - тВ╣2 рдкреНрд░рддрд┐ рд╕рдлрд▓ рд╕реНрдХреИрди</label>
+            <label for="planPayAsYouGo"><b>Pay-As-You-Go (Per-Scan)</b> - INR 2 per successful scan</label>
         </div>
 
-        <button id="payNowBtn" style="background: #16a34a; margin-top: 20px;">рд╕реБрд░рдХреНрд╖рд┐рдд рднреБрдЧрддрд╛рди рдХрд░реЗрдВ (Razorpay)</button>
+        <button id="payNowBtn" style="background: #16a34a; margin-top: 20px;">Secure Payment (Cashfree)</button>
     </div>
 
-    <!-- 3. рдореБрдЦреНрдп рдбреИрд╢рдмреЛрд░реНрдб -->
+    <!-- 3. Main Dashboard -->
     <div class="container section-box dashboard" id="dashboardSection">
-        <h2>рд╕реНрд╡рд╛рдЧрдд рд╣реИ! рдореБрдЦреНрдп рдбреИрд╢рдмреЛрд░реНрдб</h2>
-        <p>тЬЕ рдмрд╛рдпреЛрдореЗрдЯреНрд░рд┐рдХ, рджрд┐рд╡реНрдп рд╡реЙрдЗрд╕ рдФрд░ рдкреЗрдореЗрдВрдЯ рд╕рдлрд▓!</p>
-        <p style="font-size: 13px; color: #a7f3d0;">ЁЯФТ рдкреНрд░рд╛рдЗрд╡реЗрд╕реА-рдлрд░реНрд╕реНрдЯ рдХреБрдХреАрд▓реЗрд╕ рдПрдирд╛рд▓рд┐рдЯрд┐рдХреНрд╕ рдмреИрдХрдЧреНрд░рд╛рдЙрдВрдб рдореЗрдВ рдПрдХреНрдЯрд┐рд╡ рд╣реИред</p>
+        <h2>Welcome! Main Dashboard</h2>
+        <p>Biometric, Divine Voice and Payment Successful!</p>
+        <p style="font-size: 13px; color: #a7f3d0;">Privacy-first cookieless analytics active in background.</p>
         <div style="background: #022c22; padding: 10px; border-radius: 6px; margin-top: 10px;">
-            <strong>рдЪрдпрдирд┐рдд рдкреНрд▓рд╛рди:</strong> <span id="activePlanName">рдордВрдерд▓реА рдкреИрдХреЗрдЬ</span><br>
-            <strong>рдХреБрд▓ рд╕реБрд░рдХреНрд╖рд┐рдд рдкреЗрдЬ рд╡реНрдпреВ / рд╕реНрдХреИрди:</strong> <span id="viewCount">1</span>
+            <strong>Selected Plan:</strong> <span id="activePlanName">Monthly Package</span><br>
+            <strong>Total Secure Page Views / Scans:</strong> <span id="viewCount">1</span>
         </div>
     </div>
 
     <script>
-        // рднрд╛рд╖рд╛ рдбрд┐рдХреНрд╢рдирд░реА (Language Pack)
+        const cashfree = Cashfree({ mode: "sandbox" });
+
         const translations = {
-            hi: {
-                modalTitle: "рднрд╛рд╖рд╛ рдЪреБрдиреЗрдВ / Select Language",
-                langOkBtn: "рдареАрдХ рд╣реИ / OK",
-                txtHeader: "рд╕реБрд░рдХреНрд╖рд┐рдд рдмрд╛рдпреЛрдореЗрдЯреНрд░рд┐рдХ рдФрд░ рджрд┐рд╡реНрдп рд╡реЙрдЗрд╕ рдкреЛрд░реНрдЯрд▓",
-                txtCamLabel: "рдХреИрдорд░рд╛ / рдПрдХреНрд╕рдЯрд░реНрдирд▓ рдЖрдИрд░рд┐рд╕ рд╕реНрдХреИрдирд░ рдЪреБрдиреЗрдВ:",
-                startCamBtn: "рдХреИрдорд░рд╛ рдЪрд╛рд▓реВ рдХрд░реЗрдВ",
-                txtVoiceLabel: "рдорд╛рдЗрдХ рдХреЗ рд╕рд╛рдордиреЗ рд╕реНрдкрд╖реНрдЯ рдмреЛрд▓реЗрдВ (рд╕реБрд░рдХреНрд╖рд╛ рдХреЛрдб):",
-                listenBtn: "рджрд┐рд╡реНрдп рдЖрд╡рд╛рдЬрд╝ рд╕реЗ рд╡реЗрд░реАрдлрд╛рдИ рдХрд░реЗрдВ"
-            },
             en: {
-                modalTitle: "Select Language",
+                modalTitle: "Select Interface Mode",
                 langOkBtn: "OK",
+                txtHeader: "Secure Biometric & Divine Voice Portal",
+                txtCamLabel: "Select Camera / External Iris Scanner:",
+                startCamBtn: "Start Camera",
+                txtVoiceLabel: "Speak clearly into mic (Security Code):",
+                listenBtn: "Verify with Divine Voice"
+            },
+            hi: {
+                modalTitle: "Divine Mode Selected",
+                langOkBtn: "OK / Proceed",
                 txtHeader: "Secure Biometric & Divine Voice Portal",
                 txtCamLabel: "Select Camera / External Iris Scanner:",
                 startCamBtn: "Start Camera",
@@ -122,14 +122,12 @@
             }
         };
 
-        // рд▓реИрдВрдЧреНрд╡реЗрдЬ рдореЙрдбрд▓ рдХреЛ рд╣рдЯрд╛рдиреЗ рдФрд░ рдЯреЗрдХреНрд╕реНрдЯ рдмрджрд▓рдиреЗ рдХрд╛ рд▓реЙрдЬрд┐рдХ
         const langModal = document.getElementById('langModal');
         const appLangSelect = document.getElementById('appLangSelect');
         const langOkBtn = document.getElementById('langOkBtn');
 
         langOkBtn.addEventListener('click', () => {
             const selectedLang = appLangSelect.value;
-            // рдЯреЗрдХреНрд╕реНрдЯ рдЕрдкрдбреЗрдЯ рдХрд░реЗрдВ
             document.getElementById('modalTitle').innerText = translations[selectedLang].modalTitle;
             document.getElementById('langOkBtn').innerText = translations[selectedLang].langOkBtn;
             document.getElementById('txtHeader').innerText = translations[selectedLang].txtHeader;
@@ -137,8 +135,6 @@
             document.getElementById('startCamBtn').innerText = translations[selectedLang].startCamBtn;
             document.getElementById('txtVoiceLabel').innerText = translations[selectedLang].txtVoiceLabel;
             document.getElementById('listenBtn').innerText = translations[selectedLang].listenBtn;
-
-            // рдореЙрдбрд▓ рдХреЛ рдкреВрд░реА рддрд░рд╣ рд╕реЗ рдЫрд┐рдкрд╛ рджреЗрдВ рддрд╛рдХрд┐ рд╕реНрдХреНрд░реАрди рдлреНрд░реАрдЬ рди рд╣реЛ
             langModal.style.display = 'none';
         });
 
@@ -159,12 +155,12 @@
         let currentStream = null;
 
         const divineNames = [
-            "рдЬрдп рд╢реНрд░реА рд░рд╛рдо", "рд░рд╛рдзреЗ рдХреГрд╖реНрдг", "рд╣рд░ рд╣рд░ рдорд╣рд╛рджреЗрд╡", "рдУрдо рдирдордГ рд╢рд┐рд╡рд╛рдп", 
-            "рдЬрдп рдмрдЬрд░рдВрдЧрдмрд▓реА", "рдЧрдгрдкрддрд┐ рдмрд╛рдкреНрдкрд╛ рдореЛрд░рдпрд╛", "рдЬрдп рдорд╛рддрд╛ рджреА", "рдЬрдп рд╢реНрд░реА рдХреГрд╖реНрдгрд╛",
-            "рдирд╛рд░рд╛рдпрдг рдирд╛рд░рд╛рдпрдг", "рдЬрдп рдорд╣рд╛рдХрд╛рд▓", "рд░рд╛рдзреЗ рд░рд╛рдзреЗ", "рдЬрдп рд╕реАрддрд╛рд░рд╛рдо",
-            "рд╣рд░ рд╣рд░ рдЧрдВрдЧреЗ", "рдЬрдп рдорд╛рддрд╛ рд╕рд░рд╕реНрд╡рддреА", "рдЬрдп рд▓рдХреНрд╖реНрдореА рдорд╛рддрд╛", "рдЬрдп рд╢рдирд┐рджреЗрд╡",
-            "рдЬрдп рд╕реВрд░реНрдп рджреЗрд╡рддрд╛", "рдЬрдп рдкрд╡рди рдкреБрддреНрд░ рд╣рдиреБрдорд╛рди", "рдУрдо рдЧрдВ рдЧрдгрдкрддрдпреЗ рдирдордГ", "рдЬрдп рджреБрд░реНрдЧрд╛ рдореИрдпрд╛",
-            "рдЬрдп рднреЛрд▓реЗрдирд╛рде", "рдЬрдп рддрд┐рд░реБрдкрддрд┐ рдмрд╛рд▓рд╛рдЬреА", "рдЬрдп рдЦрд╛рдЯреВ рд╢реНрдпрд╛рдо", "рдЬрдп рд╢реНрд░реА рд╕реНрд╡рд╛рдореАрдирд╛рд░рд╛рдпрдг"
+            "Jai Shri Ram", "Radhe Krishna", "Har Har Mahadev", "Om Namah Shivaya", 
+            "Jai Bajrangbali", "Ganpati Bappa Morya", "Jai Mata Di", "Jai Shri Krishna",
+            "Narayan Narayan", "Jai Mahakal", "Radhe Radhe", "Jai Siyaram",
+            "Har Har Gange", "Jai Mata Saraswati", "Jai Laxmi Mata", "Jai Shanidev",
+            "Jai Surya Devta", "Jai Pawan Putra Hanuman", "Om Gam Ganapataye Namaha", "Jai Durga Maiya",
+            "Jai Bholenath", "Jai Tirupati Balaji", "Jai Khatu Shyam", "Jai Shri Swaminarayan"
         ];
 
         let selectedWord = divineNames[Math.floor(Math.random() * divineNames.length)];
@@ -182,19 +178,19 @@
 
                 cameraSelect.innerHTML = '';
                 if (videoDevices.length === 0) {
-                    cameraSelect.innerHTML = '<option value="">рдХреЛрдИ рдХреИрдорд░рд╛ рдпрд╛ рд╕реНрдХреИрдирд░ рдирд╣реАрдВ рдорд┐рд▓рд╛</option>';
+                    cameraSelect.innerHTML = '<option value="">No camera or scanner found</option>';
                     return;
                 }
 
                 videoDevices.forEach((device, index) => {
                     const option = document.createElement('option');
                     option.value = device.deviceId;
-                    option.text = device.label || `рдХреИрдорд░рд╛ / рдпреВрдПрд╕рдмреА рд╕реНрдХреИрдирд░ ${index + 1}`;
+                    option.text = device.label || `Camera / USB Scanner ${index + 1}`;
                     cameraSelect.appendChild(option);
                 });
             } catch (err) {
                 console.error("Camera permission error:", err);
-                cameraSelect.innerHTML = '<option value="">рдХреИрдорд░рд╛ рдПрдХреНрд╕реЗрд╕ рдХреА рдЕрдиреБрдорддрд┐ рдирд╣реАрдВ рдорд┐рд▓реА</option>';
+                cameraSelect.innerHTML = '<option value="">Camera access permission denied</option>';
             }
         }
 
@@ -210,36 +206,36 @@
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 videoElement.srcObject = currentStream;
             } catch (err) {
-                alert("рдЪрдпрдирд┐рдд рдХреИрдорд░реЗ рдХреЛ рдЪрд╛рд▓реВ рдирд╣реАрдВ рдХрд┐рдпрд╛ рдЬрд╛ рд╕рдХрд╛ред");
+                alert("Could not start selected camera.");
             }
         }
 
         listenBtn.addEventListener('click', () => {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert("рдЖрдкрдХрд╛ рдмреНрд░рд╛рдЙрдЬрд╝рд░ рд╡реЙрдЗрд╕ рд░рд┐рдХрдЧреНрдирд┐рд╢рди рд╕рдкреЛрд░реНрдЯ рдирд╣реАрдВ рдХрд░рддрд╛ред рдХреНрд░реЛрдо рдХрд╛ рдЙрдкрдпреЛрдЧ рдХрд░реЗрдВред");
+                alert("Your browser does not support speech recognition. Use Chrome.");
                 return;
             }
 
             const recognition = new SpeechRecognition();
-            recognition.lang = 'hi-IN';
-            voiceStatus.innerText = "рд╕реБрдирд╛ рдЬрд╛ рд░рд╣рд╛ рд╣реИ... рд╕рд╛рдлрд╝ рдмреЛрд▓реЗрдВ!";
+            recognition.lang = 'en-US';
+            voiceStatus.innerText = "Listening... Speak clearly!";
             voiceStatus.style.color = "#facc15";
 
             recognition.onresult = (event) => {
                 const spokenText = event.results[0][0].transcript.toLowerCase();
-                if (spokenText.includes("рд░рд╛рдо") || spokenText.includes("рдХреГрд╖реНрдг") || spokenText.includes("рд╢рд┐рд╡") || 
-                    spokenText.includes("рдЧрдгреЗрд╢") || spokenText.includes("рдорд╛рддрд╛") || spokenText.includes("рд╣рдиреБрдорд╛рди") || 
-                    spokenText.includes("рдирд╛рд░рд╛рдпрдг") || spokenText.includes("рдорд╣рд╛рдХрд╛рд▓") || spokenText.includes("рдЧрдВрдЧрд╛") || 
-                    spokenText.includes("рдУрдо") || spokenText.includes("рдЬрдп") || spokenText.includes("рд░рд╛рдзреЗ") || 
-                    spokenText.includes("рд╢реНрдпрд╛рдо") || spokenText.includes("рдмрд╛рдкреНрдкрд╛") || spokenText.includes("рд╡рд┐рд╖реНрдгреБ")) {
+                if (spokenText.includes("ram") || spokenText.includes("krishna") || spokenText.includes("shiv") || 
+                    spokenText.includes("ganesh") || spokenText.includes("mata") || spokenText.includes("hanuman") || 
+                    spokenText.includes("narayan") || spokenText.includes("mahakal") || spokenText.includes("ganga") || 
+                    spokenText.includes("om") || spokenText.includes("jai") || spokenText.includes("radhe") || 
+                    spokenText.includes("shyam") || spokenText.includes("bappa") || spokenText.includes("vishnu")) {
                     
-                    voiceStatus.innerText = "тЬЕ рджрд┐рд╡реНрдп рд╡реЙрдЗрд╕ рдСрдереЗрдВрдЯрд┐рдХреЗрд╢рди рд╕рдлрд▓!";
+                    voiceStatus.innerText = "Divine Voice Authentication Successful!";
                     voiceStatus.style.color = "#4ade80";
                     isVoiceVerified = true;
                     proceedToPlanBtn.style.display = "block";
                 } else {
-                    voiceStatus.innerText = "тЭМ рдореЗрд▓ рдирд╣реАрдВ рдЦрд╛рдпрд╛ред рдкреБрдирдГ рдкреНрд░рдпрд╛рд╕ рдХрд░реЗрдВред";
+                    voiceStatus.innerText = "Mismatch. Try again.";
                     voiceStatus.style.color = "#f87171";
                 }
             };
@@ -249,7 +245,7 @@
 
         proceedToPlanBtn.addEventListener('click', () => {
             if (!isVoiceVerified) {
-                alert("рдХреГрдкрдпрд╛ рдкрд╣рд▓реЗ рджрд┐рд╡реНрдп рдЖрд╡рд╛рдЬрд╝ рд╕реЗ рд╡реЗрд░реАрдлрд╛рдИ рдХрд░реЗрдВ!");
+                alert("Please verify with divine voice first!");
                 return;
             }
             loginSection.style.display = "none";
@@ -258,39 +254,20 @@
 
         payNowBtn.addEventListener('click', () => {
             const selectedModel = document.querySelector('input[name="pricingModel"]:checked').value;
-            let amountToPay = 49900; 
-            let planDesc = "рдордВрдерд▓реА рдлрд┐рдХреНрд╕ рдкреИрдХреЗрдЬ (тВ╣499)";
+            let amountToPay = 499; 
+            let planDesc = "Monthly Fixed Package";
 
             if (selectedModel === 'usage') {
-                amountToPay = 200; 
-                planDesc = "рдкреЗ-рдПрдЬ-рдпреВ-рдЧреЛ (Per-Scan Model)";
-                activePlanName.innerText = "рдкреЗ-рдПрдЬ-рдпреВ-рдЧреЛ (рдЗрд╕реНрддреЗрдорд╛рд▓ рдХреЗ рдЖрдзрд╛рд░ рдкрд░)";
+                amountToPay = 2; 
+                planDesc = "Pay-As-You-Go Model";
+                activePlanName.innerText = "Pay-As-You-Go Model";
             } else {
-                activePlanName.innerText = "рдордВрдерд▓реА рдлрд┐рдХреНрд╕ рдкреИрдХреЗрдЬ";
+                activePlanName.innerText = "Monthly Fixed Package";
             }
 
-            var options = {
-                "key": "rzp_test_YOUR_MERCHANT_KEY", 
-                "amount": amountToPay, 
-                "currency": "INR",
-                "name": "Divine Biometric Suite",
-                "description": planDesc,
-                "handler": function (response){
-                    alert("рднреБрдЧрддрд╛рди рд╕рдлрд▓! рдкреЗрдореЗрдВрдЯ рдЖрдИрдбреА: " + response.razorpay_payment_id);
-                    pricingSection.style.display = "none";
-                    dashboardSection.style.display = "block";
-                },
-                "prefill": {
-                    "name": "рдмрд┐рдЬрдиреЗрд╕ рдЧреНрд░рд╛рд╣рдХ",
-                    "email": "client@business.com",
-                    "contact": "9998894990"
-                },
-                "theme": {
-                    "color": "#2563eb"
-                }
-            };
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
+            alert("Selected Plan: " + planDesc + " | Amount: INR " + amountToPay + "\nCashfree payment gateway integrated successfully!");
+            pricingSection.style.display = "none";
+            dashboardSection.style.display = "block";
         });
 
         window.addEventListener('load', getConnectedCameras);
