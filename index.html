@@ -254,6 +254,11 @@
         startCamera(cameraSelect.value);
     });
 
+    // पेज लोड होते ही कैमरा चालू करें
+    window.addEventListener('load', () => {
+        initCameras();
+    });
+
     // 2. वॉयस ऑथेंटिकेशन शुरू करें
     function startVoiceAuth() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -263,7 +268,7 @@
         }
 
         const recognition = new SpeechRecognition();
-        recognition.lang = 'hi-IN'; // हिंदी और अंग्रेजी दोनों समझेगा
+        recognition.lang = 'hi-IN';
         recognition.interimResults = false;
 
         statusLog.innerText = "सुन रहा है... कृपया 'राम' या 'Ram' बोलें...";
@@ -298,7 +303,25 @@
     function payNow(amount, planName) {
         var options = {
             "key": "rzp_test_TzHOgP7cLQsw9P", // आपकी Razorpay Key ID
-            "amount": amount * 100, // रुपये को पैसे में बदलना (499 * 100)
+            "amount": amount * 100, // रुपये को पैसे में बदलना
             "currency": "INR",
             "name": "Aura Crypt Security",
-            "description": plan
+            "description": planName,
+            "handler": function (response){
+                alert("पेमेंट सफल रहा! Payment ID: " + response.razorpay_payment_id);
+            },
+            "prefill": {
+                "name": "Ravindra Suthar",
+                "email": "sutharravindra999@gmail.com"
+            },
+            "theme": {
+                "color": "#0284c7"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+</script>
+
+</body>
+</html>
