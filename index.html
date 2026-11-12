@@ -3,216 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Crypt - Biometric & Dual Language Voice Authentication</title>
+    <title>Aura Crypt Security</title>
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         body {
-            background-color: #0b131b;
+            background-color: #0b111e;
             color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
         }
         .container {
+            background-color: #131c2e;
+            border: 1px solid #23314d;
+            border-radius: 12px;
+            width: 100%;
             max-width: 420px;
-            margin: auto;
-            background: #121e2b;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #e2e8f0;
         }
         select, button {
             width: 100%;
             padding: 12px;
-            margin-top: 10px;
-            border-radius: 5px;
+            border-radius: 8px;
             border: none;
-            font-size: 16px;
+            font-size: 1rem;
+            margin-bottom: 15px;
         }
         select {
-            background: #1e293b;
-            color: white;
+            background-color: #1e293b;
+            color: #fff;
+            border: 1px solid #334155;
         }
-        .btn-audio {
+        .video-box {
+            width: 100%;
+            height: 280px;
+            background-color: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 2px solid #1e293b;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .btn-primary {
             background-color: #0284c7;
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: background 0.3s;
         }
-        .btn-audio:hover {
+        .btn-primary:hover {
             background-color: #0369a1;
         }
-        video {
-            width: 100%;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        #auth-instruction {
-            margin-top: 15px;
+        .prompt-text {
             color: #facc15;
+            font-size: 1.1rem;
             font-weight: bold;
-            font-size: 15px;
-            line-height: 1.5;
+            margin: 10px 0;
         }
-        #ledger-status {
-            margin-top: 10px;
-            font-size: 13px;
+        .status-log {
+            font-size: 0.9rem;
             color: #38bdf8;
+            margin-top: 8px;
+            min-height: 20px;
+        }
+
+        /* Subscription Plans Section (Hidden initially) */
+        #paymentSection {
+            display: none;
+            margin-top: 15px;
+            text-align: left;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .plan-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .plan-info h3 {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            margin-bottom: 4px;
+        }
+        .plan-info p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .pay-btn {
+            width: auto;
+            padding: 10px 18px;
+            background-color: #10b981;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .pay-btn:hover {
+            background-color: #059669;
+        }
+        .success-badge {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 1px solid #10b981;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Aura Crypt Security</h2>
-        
-        <label for="cameraSelect">कैमरा चुनें (Mobile/Desktop/IR):</label>
-        <select id="cameraSelect">
-            <!-- कैमरे के विकल्प यहाँ लोड होंगे -->
-        </select>
+<div class="container">
+    <!-- Step 1: Camera & Voice Authentication -->
+    <div id="authSection">
+        <h2>कैमरा चुनें (Mobile/Desktop/IR):</h2>
+        <select id="cameraSelect"></select>
 
-        <video id="videoElement" autoplay playsinline></video>
+        <div class="video-box">
+            <video id="videoFeed" autoplay playsinline></video>
+        </div>
 
-        <!-- वॉइस ऑथेंटिकेशन बटन -->
-        <button onclick="startVoiceAuthentication()" class="btn-audio">वॉइस ऑथेंटिकेशन शुरू करें</button>
+        <button class="btn-primary" id="startAuthBtn" onclick="startVoiceAuth()">
+            वॉइस ऑथेंटिकेशन शुरू करें
+        </button>
 
-        <!-- निर्देश और हिंदी/इंग्लिश दोनों में देवता का नाम -->
-        <p id="auth-instruction">Listening... Please speak the deity name shown below / कृपया नीचे दिया गया नाम बोलें...</p>
-        <p id="ledger-status"></p>
+        <div class="prompt-text">
+            Say / बोलें:<br>
+            <span style="color: #4ade80; font-size: 1.3rem;">राम / Ram</span>
+        </div>
+
+        <div class="status-log" id="statusLog">प्रतीक्षा कर रहा है...</div>
     </div>
 
-    <script>
-        // सनातन धर्म के सभी प्रमुख देवी-देवताओं की सूची (हिंदी और अंग्रेजी दोनों फॉर्मेट में)
-        const deities = [
-            { hi: "गणेश", en: "Ganesh" },
-            { hi: "शिव", en: "Shiva" },
-            { hi: "विष्णु", en: "Vishnu" },
-            { hi: "ब्रह्मा", en: "Brahma" },
-            { hi: "राम", en: "Ram" },
-            { hi: "कृष्ण", en: "Krishna" },
-            { hi: "हनुमान", en: "Hanuman" },
-            { hi: "सूर्य", en: "Surya" },
-            { hi: "चंद्र", en: "Chandra" },
-            { hi: "अग्नि", en: "Agni" },
-            { hi: "वायु", en: "Vayu" },
-            { hi: "इंद्र", en: "Indra" },
-            { hi: "वरुण", en: "Varun" },
-            { hi: "कुबेर", en: "Kuber" },
-            { hi: "यमराज", en: "Yamraj" },
-            { hi: "कार्तिकेय", en: "Kartikeya" },
-            { hi: "विश्वकर्मा", en: "Vishwakarma" },
-            { hi: "धनवंतरी", en: "Dhanvantari" },
-            { hi: "माता दुर्गा", en: "Mata Durga" },
-            { hi: "माता लक्ष्मी", en: "Mata Lakshmi" },
-            { hi: "माता सरस्वती", en: "Mata Saraswati" },
-            { hi: "माता काली", en: "Mata Kali" },
-            { hi: "माता सीता", en: "Mata Sita" },
-            { hi: "माता पार्वती", en: "Mata Parvati" },
-            { hi: "माता राधा", en: "Mata Radha" },
-            { hi: "माता गंगा", en: "Mata Ganga" },
-            { hi: "माता गायत्री", en: "Mata Gayatri" },
-            { hi: "माता अन्नपूर्णा", en: "Mata Annapurna" },
-            { hi: "माता संतोषी", en: "Mata Santoshi" },
-            { hi: "माता तुलसी", en: "Mata Tulsi" }
-        ];
+    <!-- Step 2: Subscription Plans & Razorpay Payment -->
+    <div id="paymentSection">
+        <div class="success-badge">
+            ✅ ऑथेंटिकेशन सफल! (राम / Ram)
+        </div>
+        <h2 style="text-align: center; margin-bottom: 15px;">अपना सब्सक्रिप्शन प्लान चुनें</h2>
 
-        let targetDeity = {};
+        <div class="plan-card">
+            <div class="plan-info">
+                <h3>₹499 / महीना</h3>
+                <p>बेसिक सिक्योरिटी एक्सेस</p>
+            </div>
+            <button class="pay-btn" onclick="payNow(499, 'Basic Plan')">Pay ₹499</button>
+        </div>
 
-        // रैंडम देवता चुनने का फंक्शन जो हिंदी और इंग्लिश दोनों नाम स्क्रीन पर दिखाएगा
-        function setRandomDeityPrompt() {
-            const randomIndex = Math.floor(Math.random() * deities.length);
-            targetDeity = deities[randomIndex];
+        <div class="plan-card">
+            <div class="plan-info">
+                <h3>₹999 / महीना</h3>
+                <p>स्टैंडर्ड बायोमेट्रिक सुरक्षा</p>
+            </div>
+            <button class="pay-btn" onclick="payNow(999, 'Standard Plan')">Pay ₹999</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-info">
+                <h3>₹1599 / महीना</h3>
+                <p>प्रो एडवांस्ड ट्रैकिंग</p>
+            </div>
+            <button class="pay-btn" onclick="payNow(1599, 'Pro Plan')">Pay ₹1599</button>
+        </div>
+
+        <div class="plan-card">
+            <div class="plan-info">
+                <h3>₹3000 / महीना</h3>
+                <p>एंटरप्राइज हाई-सिक्योरिटी</p>
+            </div>
+            <button class="pay-btn" onclick="payNow(3000, 'Enterprise Plan')">Pay ₹3000</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('videoFeed');
+    const cameraSelect = document.getElementById('cameraSelect');
+    const statusLog = document.getElementById('statusLog');
+    let currentStream = null;
+
+    // 1. कैमरे की लिस्ट लोड करें और चालू करें
+    async function initCameras() {
+        try {
+            await navigator.mediaDevices.getUserMedia({ video: true });
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
             
-            const instructionElement = document.getElementById('auth-instruction');
-            if (instructionElement) {
-                // यहाँ हिंदी और अंग्रेजी दोनों साफ दिखेंगे ताकि किसी भी देश का यूजर आसानी से पढ़ सके
-                instructionElement.innerHTML = `Say / बोलें:<br><span style="font-size: 18px; color: #4ade80;">${targetDeity.hi} / ${targetDeity.en}</span>`;
+            cameraSelect.innerHTML = '';
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = device.label || `camera ${index + 1}`;
+                cameraSelect.appendChild(option);
+            });
+
+            if (videoDevices.length > 0) {
+                startCamera(videoDevices[0].deviceId);
             }
+        } catch (err) {
+            statusLog.innerText = "कैमरा एक्सेस नहीं मिला: " + err.message;
+        }
+    }
+
+    async function startCamera(deviceId) {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+        try {
+            currentStream = await navigator.mediaDevices.getUserMedia({
+                video: { deviceId: deviceId ? { exact: deviceId } : undefined }
+            });
+            video.srcObject = currentStream;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    cameraSelect.addEventListener('change', () => {
+        startCamera(cameraSelect.value);
+    });
+
+    // 2. वॉयस ऑथेंटिकेशन शुरू करें
+    function startVoiceAuth() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            statusLog.innerText = "आपका ब्राउज़र वॉयस रिकग्निशन सपोर्ट नहीं करता।";
+            return;
         }
 
-        // वॉइस ऑथेंटिकेशन और लेजर डेटाबेस लॉगिंग
-        function startVoiceAuthentication() {
-            setRandomDeityPrompt();
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'hi-IN'; // हिंदी और अंग्रेजी दोनों समझेगा
+        recognition.interimResults = false;
 
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Your browser does not support Speech Recognition. Please use Google Chrome.");
-                return;
-            }
+        statusLog.innerText = "सुन रहा है... कृपया 'राम' या 'Ram' बोलें...";
 
-            const recognition = new SpeechRecognition();
-            // भाषा को 'hi-IN' या 'en-US' दोनों के लिए लचीला बनाया गया है ताकि हिंदी और अंग्रेजी दोनों आवाजें डिटेक्ट हो सकें
-            recognition.lang = 'hi-IN'; 
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript.trim().toLowerCase();
+            statusLog.innerText = "आपने कहा: " + transcript;
 
-            recognition.onresult = function(event) {
-                const spokenText = event.results[0][0].transcript.trim().toLowerCase();
-                const hindiName = targetDeity.hi.toLowerCase();
-                const englishName = targetDeity.en.toLowerCase();
-
-                // चेक करेगा कि यूजर ने हिंदी या अंग्रेजी, दोनों में से कोई भी सही उच्चारण किया या नहीं
-                if (spokenText.includes(hindiName) || spokenText.includes(englishName)) {
-                    alert(`Success! Authentication Passed. You spoke: '${targetDeity.en}'`);
-                    saveToLedger(targetDeity.hi + " / " + targetDeity.en, "SUCCESS");
-                } else {
-                    alert(`Failed! Expected: '${targetDeity.en} (${targetDeity.hi})'. Please try again.`);
-                    saveToLedger(targetDeity.hi + " / " + targetDeity.en, "FAILED");
-                    setRandomDeityPrompt();
-                }
-            };
-
-            recognition.onerror = function(event) {
-                console.error("Speech Recognition Error:", event.error);
-            };
-
-            recognition.start();
-        }
-
-        // लेजर डेटाबेस लॉग में एंट्री सेव करने का फंक्शन
-        function saveToLedger(deityName, status) {
-            const ledgerEntry = {
-                timestamp: new Date().toLocaleString(),
-                verifiedDeity: deityName,
-                authenticationStatus: status,
-                device: navigator.userAgent
-            };
-
-            let existingLedger = JSON.parse(localStorage.getItem('aura_crypt_ledger') || '[]');
-            existingLedger.push(ledgerEntry);
-            localStorage.setItem('aura_crypt_ledger', JSON.stringify(existingLedger));
-
-            document.getElementById('ledger-status').innerText = `Ledger Log Updated: ${status} (${deityName})`;
-        }
-
-        // कैमरा सेटअप
-        async function setupCamera() {
-            try {
-                const videoElement = document.getElementById('videoElement');
-                const cameraSelect = document.getElementById('cameraSelect');
+            if (transcript.includes('राम') || transcript.includes('ram')) {
+                statusLog.innerText = "Ledger Log Updated: SUCCESS (राम / Ram)";
+                statusLog.style.color = "#4ade80";
                 
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                
-                cameraSelect.innerHTML = '';
-                videoDevices.forEach((device, index) => {
-                    const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Camera ${index + 1}`;
-                    cameraSelect.appendChild(option);
-                });
-
-                if (videoDevices.length > 0) {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { deviceId: videoDevices[0].deviceId }
-                    });
-                    videoElement.srcObject = stream;
-                }
-            } catch (err) {
-                console.error("Camera access error:", err);
+                // 1 सेकंड बाद पेमेंट प्लान वाला सेक्शन दिखाएं
+                setTimeout(() => {
+                    document.getElementById('authSection').style.display = 'none';
+                    document.getElementById('paymentSection').style.display = 'block';
+                }, 1000);
+            } else {
+                statusLog.innerText = "आवाज़ मैच नहीं हुई। कृपया फिर से 'राम' बोलें।";
+                statusLog.style.color = "#f87171";
             }
-        }
+        };
 
-        setupCamera();
-    </script>
-</body>
-</html>
+        recognition.onerror = function(event) {
+            statusLog.innerText = "त्रुटि: " + event.error + " (माइक की अनुमति दें)";
+        };
+
+        recognition.start();
+    }
+
+    // 3. Razorpay पेमेंट विंडो खोलें
+    function payNow(amount, planName) {
+        var options = {
+            "key": "rzp_test_TzHOgP7cLQsw9P", // आपकी Razorpay Key ID
+            "amount": amount * 100, // रुपये को पैसे में बदलना (499 * 100)
+            "currency": "INR",
+            "name": "Aura Crypt Security",
+            "description": plan
