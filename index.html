@@ -3,191 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Crypt - 3D Portable Space Lock & Biometric System</title>
-    <!-- Tailwind CSS for futuristic UI -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Aura Crypt - Security Checkpoint</title>
+    <!-- MediaPipe Face Mesh CDN for Client-Side Eye/Iris Tracking -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Inter:wght@300;400;600&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f3f4f6; }
-        .font-orbitron { font-family: 'Orbitron', sans-serif; }
-        .glow-box { box-shadow: 0 0 25px rgba(59, 130, 246, 0.2); }
-        .glow-green { box-shadow: 0 0 25px rgba(34, 197, 94, 0.3); }
-        .glow-red { box-shadow: 0 0 25px rgba(239, 68, 68, 0.3); }
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: #131b2e;
+            border: 1px solid #1f293d;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h2 { font-size: 20px; margin-bottom: 15px; color: #00ffcc; }
+        .checkpoint-box {
+            background: #1a233a;
+            border: 1px solid #22c55e;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            background-color: #22c55e;
+            color: #000;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .btn:hover { background-color: #16a34a; color: #fff; }
+        select, video {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: #0b0f19;
+            color: #fff;
+            border: 1px solid #334155;
+            border-radius: 6px;
+        }
+        video { height: 220px; object-fit: cover; display: none; }
+        .hidden { display: none; }
+        #voiceStatus { margin-top: 10px; font-weight: bold; color: #38bdf8; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+<body>
 
-    <!-- Header -->
-    <header class="w-full max-w-4xl flex justify-between items-center border-b border-gray-800 pb-4 mb-6">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-orbitron font-bold text-xl text-white glow-box">AC</div>
-            <div>
-                <h1 class="font-orbitron text-xl font-bold tracking-wider text-blue-400">AURA CRYPT</h1>
-                <p class="text-xs text-gray-400">3D Portable Space & Biometric Lock</p>
-            </div>
-        </div>
-        <div id="statusBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-red-950 text-red-400 border border-red-800">
-            SYSTEM LOCKED
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Left Box: Security & Scanning Panel -->
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 glow-box flex flex-col justify-between">
-            <div>
-                <h2 class="font-orbitron text-lg font-semibold mb-4 text-blue-300">Security Checkpoint</h2>
-                
-                <!-- Steps Status -->
-                <div class="space-y-3 mb-6">
-                    <div id="step1" class="flex items-center space-x-3 text-sm text-gray-400 bg-gray-950 p-3 rounded-xl border border-gray-800">
-                        <span class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center text-xs">1</span>
-                        <span>Iris & Biometric Sensor Scan</span>
-                    </div>
-                    <div id="step2" class="flex items-center space-x-3 text-sm text-gray-400 bg-gray-950 p-3 rounded-xl border border-gray-800">
-                        <span class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center text-xs">2</span>
-                        <span>3D Portable Area Space Mapping</span>
-                    </div>
-                    <div id="step3" class="flex items-center space-x-3 text-sm text-gray-400 bg-gray-950 p-3 rounded-xl border border-gray-800">
-                        <span class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center text-xs">3</span>
-                        <span>Voice Authentication & Location Match</span>
-                    </div>
-                </div>
-
-                <!-- Voice input simulation -->
-                <div class="mb-4">
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Voice Confirmation Passphrase</label>
-                    <input type="text" id="voiceInput" placeholder="बोले या लिखें: 'Authorize Trusted Zone'" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-blue-500">
-                </div>
-            </div>
-
-            <!-- Action Button -->
-            <button onclick="runSecurityVerification()" id="actionBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-orbitron font-semibold rounded-xl transition shadow-lg shadow-blue-600/30">
-                INITIATE SPACE SCAN & UNLOCK
-            </button>
+    <div class="container">
+        <!-- स्क्रीन 1: चेकपॉइंट डैशबोर्ड -->
+        <div id="checkpoint-screen">
+            <h2>Security Checkpoint</h2>
+            <div class="checkpoint-box">✓ Iris & Biometric Sensor Scan</div>
+            <div class="checkpoint-box">✓ 3D Portable Area Space Mapping</div>
+            <div class="checkpoint-box">✓ Voice Authentication & Location Match</div>
+            
+            <button class="btn" id="secureActiveBtn">SYSTEM SECURED & ACTIVE</button>
         </div>
 
-        <!-- Right Box: Trusted Zones Manager -->
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between">
-            <div>
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="font-orbitron text-lg font-semibold text-blue-300">Trusted Zones (Multi-Location)</h2>
-                    <button onclick="addNewCurrentZone()" class="text-xs bg-gray-800 hover:bg-gray-700 text-blue-400 px-3 py-1.5 rounded-lg border border-gray-700 transition">
-                        + Save Current Zone
-                    </button>
-                </div>
-                <p class="text-xs text-gray-400 mb-4">आप अपने लैपटॉप को जिन-जिन जगहों (ऑफिस, घर, क्लाइंट साइट) पर सुरक्षित रूप से ले जाना चाहते हैं, उनके 3D मैप यहाँ सेव कर सकते हैं।</p>
-                
-                <!-- Zones List -->
-                <div id="zonesList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <!-- Dynamically populated -->
-                </div>
-            </div>
+        <!-- स्क्रीन 2: कैमरा सिलेक्शन और आई-स्कैनिंग -->
+        <div id="scanner-screen" class="hidden">
+            <h2>Camera & Biometric Scan</h2>
+            <label for="cameraSelect">कैमरा चुनें (Mobile/Desktop/IR):</label>
+            <select id="cameraSelect">
+                <option value="">कैमरा लोड हो रहा है...</option>
+            </select>
 
-            <!-- Dashboard Output Box -->
-            <div id="dashboardBox" class="mt-6 bg-gray-950 border border-gray-800 rounded-xl p-4 text-xs font-mono text-gray-400 hidden">
-                <span class="text-green-400 font-bold">[ACCESS GRANTED]:</span> 3D Space and Biometric matched successfully. Welcome, Ravindra.
-            </div>
+            <video id="webcamVideo" autoplay playsinline></video>
+
+            <button class="btn" id="startVoiceBtn" style="margin-top: 15px; background-color: #38bdf8;">वॉइस ऑथेंटिकेशन शुरू करें</button>
+            <p id="voiceStatus">पासफ्रेज़: 33 कोटि देवताओं में से नाम बोलें</p>
+
+            <button class="btn hidden" id="paymentBtn" style="background-color: #f59e0b;">भुगतान (Payment) पर आगे बढ़ें</button>
         </div>
+    </div>
 
-    </main>
-
-    <!-- Footer -->
-    <footer class="w-full max-w-4xl text-center text-xs text-gray-500 mt-8 border-t border-gray-800 pt-4">
-        &copy; 2026 Aura Crypt Security Systems. All rights reserved.
-    </footer>
-
-    <!-- JavaScript Logic -->
     <script>
-        // LocalStorage for multiple trusted zones
-        let trustedZones = JSON.parse(localStorage.getItem('aura_trusted_zones')) || [
-            { id: 1, name: "Head Office Room 402", hash: "hash_zone_office_999" },
-            { id: 2, name: "Home Workspace", hash: "hash_zone_home_101" }
-        ];
+        const secureActiveBtn = document.getElementById('secureActiveBtn');
+        const checkpointScreen = document.getElementById('checkpoint-screen');
+        const scannerScreen = document.getElementById('scanner-screen');
+        const cameraSelect = document.getElementById('cameraSelect');
+        const webcamVideo = document.getElementById('webcamVideo');
+        const startVoiceBtn = document.getElementById('startVoiceBtn');
+        const voiceStatus = document.getElementById('voiceStatus');
+        const paymentBtn = document.getElementById('paymentBtn');
 
-        function renderZones() {
-            const list = document.getElementById('zonesList');
-            list.innerHTML = '';
-            if(trustedZones.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-500 italic">No trusted zones saved yet.</p>';
+        // स्टेप 1: बटन क्लिक पर स्क्रीन बदलना और हार्डवेयर इनिशियलाइज करना
+        secureActiveBtn.addEventListener('click', async () => {
+            checkpointScreen.classList.add('hidden');
+            scannerScreen.classList.remove('hidden');
+            webcamVideo.style.display = 'block';
+            await initHardwareAndCameras();
+        });
+
+        // स्टेप 2: नेविगेटर मीडिया डिवाइस से कैमरा और माइक परमिशन व लिस्ट फेच करना
+        async function initHardwareAndCameras() {
+            try {
+                // परमिशन मांगें
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                webcamVideo.srcObject = stream;
+
+                // उपलब्ध कैमरों की लिस्ट ड्रॉपडाउन में भरना
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                cameraSelect.innerHTML = "";
+                
+                devices.forEach((device, index) => {
+                    if (device.kind === 'videoinput') {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Camera Device ${index + 1}`;
+                        cameraSelect.appendChild(option);
+                    }
+                });
+            } catch (err) {
+                console.error("हार्डवेयर एरर:", err);
+                alert("कैमरा और माइक्रोफ़ोन की अनुमति अनिवार्य है। कृपया परमिशन दें।");
+            }
+        }
+
+        // ड्रॉपडाउन बदलने पर दूसरा कैमरा स्विच करने के लिए
+        cameraSelect.addEventListener('change', async () => {
+            const deviceId = cameraSelect.value;
+            const constraints = {
+                video: { deviceId: { exact: deviceId } }
+            };
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                webcamVideo.srcObject = stream;
+            } catch (e) {
+                console.error("कैमरा स्विच करने में त्रुटि:", e);
+            }
+        });
+
+        // स्टेप 3: हिंदी स्पीच रिकग्निशन और 33 कोटि देवता वॉइस ऑथेंटिकेशन
+        startVoiceBtn.addEventListener('click', () => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("आपका ब्राउज़र स्पीच रिकग्निशन सपोर्ट नहीं करता। क्रोम ब्राउज़र इस्तेमाल करें।");
                 return;
             }
-            trustedZones.forEach(zone => {
-                list.innerHTML += `
-                    <div class="flex justify-between items-center bg-gray-950 p-3 rounded-xl border border-gray-800 text-xs">
-                        <div>
-                            <p class="font-semibold text-gray-300">${zone.name}</p>
-                            <p class="text-gray-500 text-[10px]">Hash: ${zone.hash.substring(0, 15)}...</p>
-                        </div>
-                        <button onclick="removeZone(${zone.id})" class="text-red-400 hover:text-red-300 text-xs">Delete</button>
-                    </div>
-                `;
-            });
-        }
 
-        function addNewCurrentZone() {
-            const zoneName = prompt("Enter a name for this Trusted Zone (e.g., 'Hotel Room London', 'Client Lab'):");
-            if(!zoneName) return;
-            
-            // Simulating 3D portable space hash generation
-            const randomHash = 'hash_zone_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now();
-            trustedZones.push({ id: Date.now(), name: zoneName, hash: randomHash });
-            localStorage.setItem('aura_trusted_zones', JSON.stringify(trustedZones));
-            renderZones();
-            alert("New 3D Space Trusted Zone successfully registered & locked!");
-        }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'hi-IN'; // हिंदी भाषा सेट
+            recognition.interimResults = false;
 
-        function removeZone(id) {
-            trustedZones = trustedZones.filter(z => z.id !== id);
-            localStorage.setItem('aura_trusted_zones', JSON.stringify(trustedZones));
-            renderZones();
-        }
+            voiceStatus.innerText = "सुन रहे हैं... कृपया 33 कोटि देवताओं में से कोई नाम बोलें...";
+            voiceStatus.style.color = "#facc15";
 
-        async function runSecurityVerification() {
-            const btn = document.getElementById('actionBtn');
-            const statusBadge = document.getElementById('statusBadge');
-            const step1 = document.getElementById('step1');
-            const step2 = document.getElementById('step2');
-            const step3 = document.getElementById('step3');
-            const dashboard = document.getElementById('dashboardBox');
-            
-            btn.disabled = true;
-            btn.innerText = "SCANNING IRIS & 3D SPACE...";
+            recognition.onresult = function(event) {
+                const spokenText = event.results[0][0].transcript.trim();
+                console.log("बोला गया टेक्स्ट:", spokenText);
 
-            // Step 1: Iris Scan
-            step1.className = "flex items-center space-x-3 text-sm text-blue-400 bg-blue-950/30 p-3 rounded-xl border border-blue-800/50 animate-pulse";
-            await new Promise(r => setTimeout(r, 1200));
-            step1.className = "flex items-center space-x-3 text-sm text-green-400 bg-green-950/30 p-3 rounded-xl border border-green-800/50";
-            step1.querySelector('span').className = "w-6 h-6 rounded-full bg-green-600 flex items-center justify-center text-xs text-white font-bold";
-            step1.querySelector('span').innerText = "✓";
+                // 33 कोटि देवताओं या सुरक्षित पासफ्रेज़ की सूची
+                const deitiesList = ["ब्रह्मा", "विष्णु", "शिव", "इंद्र", "अग्नि", "वरुण", "सूर्य", "चंद्रमा", "गणेश", "हनुमान", "माता"];
 
-            // Step 2: 3D Portable Area Map Scan
-            step2.className = "flex items-center space-x-3 text-sm text-blue-400 bg-blue-950/30 p-3 rounded-xl border border-blue-800/50 animate-pulse";
-            await new Promise(r => setTimeout(r, 1500));
-            step2.className = "flex items-center space-x-3 text-sm text-green-400 bg-green-950/30 p-3 rounded-xl border border-green-800/50";
-            step2.querySelector('span').className = "w-6 h-6 rounded-full bg-green-600 flex items-center justify-center text-xs text-white font-bold";
-            step2.querySelector('span').innerText = "✓";
+                const isMatched = deitiesList.some(deity => spokenText.toLowerCase().includes(deity.toLowerCase()));
 
-            // Step 3: Voice & Location Verification
-            step3.className = "flex items-center space-x-3 text-sm text-blue-400 bg-blue-950/30 p-3 rounded-xl border border-blue-800/50 animate-pulse";
-            await new Promise(r => setTimeout(r, 1200));
-            step3.className = "flex items-center space-x-3 text-sm text-green-400 bg-green-950/30 p-3 rounded-xl border border-green-800/50";
-            step3.querySelector('span').className = "w-6 h-6 rounded-full bg-green-600 flex items-center justify-center text-xs text-white font-bold";
-            step3.querySelector('span').innerText = "✓";
+                if (isMatched) {
+                    voiceStatus.innerText = `सफलतापूर्वक ऑथेंटिकेट हुआ: "${spokenText}" ✓`;
+                    voiceStatus.style.color = "#22c55e";
+                    startVoiceBtn.classList.add('hidden');
+                    paymentBtn.classList.remove('hidden'); // पेमेंट बटन दिखाना
+                } else {
+                    voiceStatus.innerText = `मैच नहीं हुआ ("${spokenText}"). फिर से बोलें।`;
+                    voiceStatus.style.color = "#ef4444";
+                }
+            };
 
-            // Success State
-            statusBadge.innerText = "SYSTEM UNLOCKED (TRUSTED ZONE)";
-            statusBadge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-green-950 text-green-400 border border-green-800";
-            
-            btn.innerText = "SYSTEM SECURED & ACTIVE";
-            btn.className = "w-full py-3 bg-green-600 text-white font-orbitron font-semibold rounded-xl shadow-lg shadow-green-600/30";
-            
-            dashboard.classList.remove('hidden');
-        }
+            recognition.onerror = (e) => {
+                voiceStatus.innerText = "वॉइस रिकग्निशन में त्रुटि आई। पुनः प्रयास करें।";
+                voiceStatus.style.color = "#ef4444";
+            };
 
-        // Initialize zones on load
-        renderZones();
+            recognition.start();
+        });
+
+        // स्टेप 4: पेमेंट गेटवे पर आगे बढ़ना
+        paymentBtn.addEventListener('click', () => {
+            alert("बायोमेट्रिक और वॉइस ऑथेंटिकेशन पूर्ण! अब पेमेंट गेटवे की प्रक्रिया शुरू हो रही है।");
+            // यहाँ आप अपना Razorpay या पेमेंट लिंक जोड़ सकते हैं
+        });
     </script>
 </body>
 </html>
