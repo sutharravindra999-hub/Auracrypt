@@ -1,327 +1,230 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Crypt Security</title>
-    <!-- Razorpay Checkout Script -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background-color: #0b111e;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px;
-        }
-        .container {
-            background-color: #131c2e;
-            border: 1px solid #23314d;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-        }
-        h2 {
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-            color: #e2e8f0;
-        }
-        select, button {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            font-size: 1rem;
-            margin-bottom: 15px;
-        }
-        select {
-            background-color: #1e293b;
-            color: #fff;
-            border: 1px solid #334155;
-        }
-        .video-box {
-            width: 100%;
-            height: 280px;
-            background-color: #000;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            border: 2px solid #1e293b;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .btn-primary {
-            background-color: #0284c7;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: #0369a1;
-        }
-        .prompt-text {
-            color: #facc15;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .status-log {
-            font-size: 0.9rem;
-            color: #38bdf8;
-            margin-top: 8px;
-            min-height: 20px;
-        }
+/**
+ * ============================================================================
+ * AURA CRYPT - संपूर्ण सनातन वॉइस ऑथेंटिकेशन सिस्टम (All-in-One Complete Code)
+ * ============================================================================
+ * इस कोड में सभी प्रमुख देवी-देवता, 33 कोटि देवगण, नवदुर्गा, महाविद्याएं,
+ * दशावतार, ज्योतिर्लिंग, नवग्रह और लोक देवताओं के सम्मानजनक नाम शामिल हैं।
+ */
 
-        /* Subscription Plans Section (Hidden initially) */
-        #paymentSection {
-            display: none;
-            margin-top: 15px;
-            text-align: left;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .plan-card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .plan-info h3 {
-            font-size: 1.1rem;
-            color: #38bdf8;
-            margin-bottom: 4px;
-        }
-        .plan-info p {
-            font-size: 0.85rem;
-            color: #94a3b8;
-        }
-        .pay-btn {
-            width: auto;
-            padding: 10px 18px;
-            background-color: #10b981;
-            color: #fff;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 0;
-        }
-        .pay-btn:hover {
-            background-color: #059669;
-        }
-        .success-badge {
-            background-color: rgba(16, 185, 129, 0.2);
-            color: #34d399;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 15px;
-            border: 1px solid #10b981;
-        }
-    </style>
-</head>
-<body>
+const SANATAN_VOICE_PASSWORDS = [
+  // =========================================================================
+  // 1. श्री राम दरबार एवं रामायण के पूज्य पात्र
+  // =========================================================================
+  { display: "जय श्री राम / Jai Shri Ram", keywords: ["जय श्री राम", "जय सिया राम", "सियावर रामचंद्र की जय", "जय श्री रघुनाथ", "जय राजा राम", "jai shri ram", "jay shree ram", "jai siya ram", "siyavar ramchandra ki jai", "ram"] },
+  { display: "जय माता जानकी / जय माँ सीता", keywords: ["जय माता जानकी", "जय माँ सीता", "जय श्री सीता राम", "जय जनक नंदिनी", "jai mata janaki", "jai maa sita", "sita ram"] },
+  { display: "जय श्री लक्ष्मण जी / जय श्री भरत जी / जय श्री शत्रुघ्न जी", keywords: ["जय श्री लक्ष्मण", "जय लक्ष्मण जी", "जय श्री भरत", "जय श्री शत्रुघ्न", "jai shri laxman", "jai lakshman ji", "jai bharat ji"] },
+  { display: "जय बजरंगबली / जय श्री हनुमान जी", keywords: ["जय बजरंगबली", "जय श्री हनुमान", "जय हनुमान जी", "संकटमोचन की जय", "जय पवनपुत्र हनुमान", "जय अंजनी पुत्र", "जय श्री बालाजी", "jai bajrangbali", "jai shri hanuman", "jai hanuman ji", "sankatmochan"] },
 
-<div class="container">
-    <!-- Step 1: Camera & Voice Authentication -->
-    <div id="authSection">
-        <h2>कैमरा चुनें (Mobile/Desktop/IR):</h2>
-        <select id="cameraSelect"></select>
+  // =========================================================================
+  // 2. श्री कृष्ण, राधा रानी एवं ब्रज के आराध्य
+  // =========================================================================
+  { display: "जय श्री कृष्ण / Jai Shri Krishna", keywords: ["जय श्री कृष्ण", "जय श्री कृष्णा", "हरे कृष्ण", "जय कन्हैया लाल की", "जय द्वारकाधीश", "जय श्री गोपाल", "जय श्री गिरिराज", "जय बांके बिहारी", "jai shri krishna", "jay shree krishna", "hare krishna", "jai dwarkadhish", "banke bihari", "krishna"] },
+  { display: "राधे राधे / जय श्री राधा रानी", keywords: ["राधे राधे", "जय श्री राधे", "जय राधा रानी", "जय श्री राधा कृष्ण", "radhe radhe", "jai shri radhe", "radha rani", "radha krishna"] },
+  { display: "जय श्री खाटू श्याम जी / हारे का सहारा", keywords: ["जय खाटू श्याम", "जय श्री श्याम", "हारे का सहारा बाबा श्याम हमारा", "जय लखदातार", "jai khatu shyam", "jai shri shyam", "baba shyam"] },
+  { display: "जय श्री जगन्नाथ जी / जय बलभद्र जी / जय सुभद्रा माता", keywords: ["जय जगन्नाथ", "जय श्री जगन्नाथ", "जय बलभद्र जी", "जय सुभद्रा माता", "jai jagannath", "jai shri jagannath"] },
+  { display: "जय श्री तिरुपति बालाजी / श्री वेंकटेश्वर भगवान", keywords: ["जय बालाजी", "जय श्री तिरुपति बालाजी", "गोविंदा गोविंदा", "जय श्री वेंकटेश्वर", "jai tirupati balaji", "govinda govinda", "venkateswara"] },
+  { display: "जय श्री विठ्ठल / जय पांडुरंग भगवान", keywords: ["जय श्री विठ्ठल", "जय पांडुरंग", "विठ्ठल विठ्ठल", "jai vitthal", "jai pandurang"] },
 
-        <div class="video-box">
-            <video id="videoFeed" autoplay playsinline></video>
-        </div>
+  // =========================================================================
+  // 3. देवाधिदेव महादेव, शिव परिवार एवं द्वादश (12) ज्योतिर्लिंग
+  // =========================================================================
+  { display: "हर हर महादेव / ॐ नमः शिवाय", keywords: ["हर हर महादेव", "ॐ नमः शिवाय", "ओम नमः शिवाय", "जय भोलेनाथ", "जय श्री महाकाल", "जय शिव शंभू", "जय नीलकंठ", "जय पशुपतिनाथ", "har har mahadev", "om namah shivay", "jai bholenath", "jai mahakal", "shiv shambhu", "shiva"] },
+  { display: "जय श्री सोमनाथ / मल्लिकार्जुन / ओंकारेश्वर / केदारनाथ", keywords: ["जय श्री सोमनाथ", "जय मल्लिकार्जुन", "जय ओंकारेश्वर", "जय श्री केदारनाथ", "जय भीमाशंकर", "jai somnath", "jai kedarnath", "jai omkareshwar"] },
+  { display: "जय श्री काशी विश्वनाथ / त्र्यंबकेश्वर / वैद्यनाथ / नागेश्वर", keywords: ["जय काशी विश्वनाथ", "जय त्र्यंबकेश्वर", "जय वैद्यनाथ", "जय नागेश्वर", "जय रामेश्वरम", "जय घृष्णेश्वर", "jai kashi vishwanath", "jai trimbakeshwar", "jai rameshwaram"] },
+  { display: "जय माँ पार्वती / जय माता गौरी / जय उमा महेश्वर", keywords: ["जय माँ पार्वती", "जय माता पार्वती", "जय गौरी शंकर", "जय माता गौरी", "जय माँ अन्नपूर्णा", "jai maa parvati", "jai gauri shankar", "maa annapurna"] },
+  { display: "जय श्री गणेश / गणपति बप्पा मोरया", keywords: ["जय श्री गणेश", "गणपति बप्पा मोरया", "ॐ गं गणपतये नमः", "जय गणेश देवा", "जय गजानन महाराज", "जय सिद्धिविनायक", "जय विघ्नहर्ता", "jai shri ganesh", "ganpati bappa morya", "jai ganesh", "siddhivinayak"] },
+  { display: "जय श्री कार्तिकेय जी / जय मुरुगन स्वामी", keywords: ["जय श्री कार्तिकेय", "जय कार्तिकेय भगवान", "जय मुरुगन", "जय सुब्रह्मण्यम", "jai shri kartikeya", "jai murugan"] },
+  { display: "जय श्री अय्यप्पा स्वामी", keywords: ["जय श्री अय्यप्पा", "स्वामी शरणम अय्यप्पा", "jai ayyappa", "swamiye saranam ayyappa"] },
 
-        <button class="btn-primary" id="startAuthBtn" onclick="startVoiceAuth()">
-            वॉइस ऑथेंटिकेशन शुरू करें
-        </button>
+  // =========================================================================
+  // 4. आदिशक्ति, नवदुर्गा, दस महाविद्याएं एवं समस्त पूज्य माताएं
+  // =========================================================================
+  { display: "जय माता दी / जय माँ दुर्गा / जय भवानी", keywords: ["जय माता दी", "जय माँ दुर्गा", "जय माता दुर्गा", "जय अंबे माता", "जय भवानी", "जय जगत जननी", "जय आदिशक्ति", "jai mata di", "jai maa durga", "jai ambe", "jai bhavani"] },
+  { display: "जय माँ शैलपुत्री / ब्रह्मचारिणी / चंद्रघंटा (नवदुर्गा)", keywords: ["जय माँ शैलपुत्री", "जय माँ ब्रह्मचारिणी", "जय माँ चंद्रघंटा", "jai shailputri", "jai brahmacharini", "jai chandraghanta"] },
+  { display: "जय माँ कूष्मांडा / स्कंदमाता / कात्यायनी (नवदुर्गा)", keywords: ["जय माँ कूष्मांडा", "जय स्कंदमाता", "जय माँ कात्यायनी", "jai kushmanda", "jai skandamata", "jai katyayani"] },
+  { display: "जय माँ कालरात्रि / महागौरी / सिद्धिदात्री (नवदुर्गा)", keywords: ["जय माँ कालरात्रि", "जय माँ महागौरी", "जय माँ सिद्धिदात्री", "jai kalratri", "jai mahagauri", "jai siddhidatri"] },
+  { display: "जय माँ लक्ष्मी / जय श्री महालक्ष्मी", keywords: ["जय माँ लक्ष्मी", "जय माता लक्ष्मी", "जय श्री महालक्ष्मी", "जय गजलक्ष्मी", "जय वैभव लक्ष्मी", "jai maa laxmi", "jai mahalaxmi", "lakshmi"] },
+  { display: "जय माँ सरस्वती / जय वीणावादिनी शारदा माता", keywords: ["जय माँ सरस्वती", "जय माता सरस्वती", "जय शारदा माता", "जय वीणावादिनी", "jai maa saraswati", "jai sharda mata"] },
+  { display: "जय माँ काली / जय महाकाली / जय भद्रकाली", keywords: ["जय माँ काली", "जय माता काली", "जय महाकाली", "जय भद्रकाली", "जय दक्षिणेश्वर काली", "jai maa kali", "jai mahakali", "bhadrakali"] },
+  { display: "जय दस महाविद्या माता (तारा, त्रिपुर सुंदरी, भुवनेश्वरी, छिन्नमस्ता)", keywords: ["जय माँ तारा", "जय त्रिपुर सुंदरी", "जय माँ भुवनेश्वरी", "जय माँ छिन्नमस्ता", "जय माँ भैरवी", "jai maa tara", "tripura sundari", "bhuvaneshwari"] },
+  { display: "जय दस महाविद्या माता (धूमावती, बगलामुखी, मातंगी, कमला)", keywords: ["जय माँ धूमावती", "जय माँ बगलामुखी", "जय माँ मातंगी", "जय माँ कमला", "jai baglamukhi", "jai matangi", "dhumavati"] },
+  { display: "जय गायत्री माता / जय वेदमाता", keywords: ["जय गायत्री माता", "जय माँ गायत्री", "ॐ भूर्भुवः स्वः", "जय वेदमाता", "jai gayatri mata", "jai maa gayatri"] },
+  { display: "जय माँ वैष्णो देवी / जय ज्वाला देवी / जय चिंतपूर्णी माता", keywords: ["जय माँ वैष्णो देवी", "जय वैष्णो माता", "जय ज्वाला देवी", "जय चिंतपूर्णी माता", "जय नैना देवी", "जय कांगड़ा देवी", "jai maa vaishno devi", "vaishno devi", "jwala devi"] },
+  { display: "जय माँ चामुंडा / जय माँ खोडियार / जय माँ आशापुरा / जय माँ अंबाजी", keywords: ["जय माँ चामुंडा", "जय माँ खोडियार", "जय माँ आशापुरा", "जय माँ अंबाजी", "जय माँ बहुचरा", "जय माँ मेलडी", "जय माँ उमा", "jai chamunda", "jai khodiyar", "jai ashapura", "jai ambaji", "bahuchara"] },
+  { display: "जय माँ संतोषी / जय माँ विंध्यवासिनी / जय माँ कामाख्या / जय माँ तुलसी", keywords: ["जय माँ संतोषी", "जय माँ विंध्यवासिनी", "जय माँ कामाख्या", "जय माँ तुलसी", "जय कुलदेवी माता", "जय ग्राम देवी", "jai maa santoshi", "vindhyavasini", "kamakhya", "tulsi mata", "kuldevi"] },
+  { display: "जय गंगा मैया / जय यमुना मैया / जय नर्मदा मैया / जय सरयू मैया", keywords: ["जय गंगा मैया", "हर हर गंगे", "जय यमुना मैया", "जय नर्मदा मैया", "नर्मदे हर", "जय सरयू मैया", "जय गोदावरी मैया", "har har gange", "jai ganga maiya", "narmade har"] },
 
-        <div class="prompt-text">
-            Say / बोलें:<br>
-            <span style="color: #4ade80; font-size: 1.3rem;">राम / Ram</span>
-        </div>
+  // =========================================================================
+  // 5. भगवान श्री विष्णु एवं सम्पूर्ण दशावतार
+  // =========================================================================
+  { display: "ॐ नमो भगवते वासुदेवाय / जय श्री हरि विष्णु", keywords: ["ॐ नमो भगवते वासुदेवाय", "ओम नमो भगवते वासुदेवाय", "जय श्री हरि", "जय श्री विष्णु", "जय श्री नारायण", "जय लक्ष्मी नारायण", "जय सत्यनारायण भगवान", "om namo bhagavate vasudevaya", "jai shri hari", "jai shri vishnu", "jai narayan", "satyanarayan"] },
+  { display: "जय श्री मत्स्य / कूर्म / वराह भगवान", keywords: ["जय मत्स्य भगवान", "जय कूर्म भगवान", "जय वराह भगवान", "jai matsya", "jai kurma", "jai varaha"] },
+  { display: "जय श्री नृसिंह भगवान / जय प्रह्लाद वरद", keywords: ["जय श्री नृसिंह", "जय नरसिंह भगवान", "जय उग्र नृसिंह", "jai shri narsingh", "jai narasimha"] },
+  { display: "जय श्री वामन / जय श्री परशुराम भगवान", keywords: ["जय वामन भगवान", "जय श्री परशुराम", "जय भगवान परशुराम", "jai vaman", "jai shri parshuram", "jai parashurama"] },
+  { display: "जय श्री बुद्ध / जय श्री कल्कि भगवान", keywords: ["जय भगवान बुद्ध", "जय श्री कल्कि", "जय कल्कि भगवान", "jai shri kalki", "jai kalki"] },
+  { display: "जय श्री दत्तात्रेय भगवान / जय श्री धन्वंतरि देव", keywords: ["जय श्री दत्तात्रेय", "जय गुरुदेव दत्त", "जय धन्वंतरि देव", "jai dattatreya", "gurudev datta", "dhanvantari"] },
 
-        <div class="status-log" id="statusLog">प्रतीक्षा कर रहा है...</div>
-    </div>
+  // =========================================================================
+  // 6. 33 कोटि वैदिक देवगण (12 आदित्य, 11 रुद्र, 8 वसु, 2 अश्विनी कुमार)
+  // =========================================================================
+  { display: "जय सृष्टिकर्ता ब्रह्मा जी", keywords: ["जय श्री ब्रह्मा", "जय ब्रह्मा देव", "जय प्रजापति ब्रह्मा", "jai shri brahma", "jai brahma dev"] },
+  { display: "जय द्वादश आदित्य (सूर्य देव, मित्र, अर्यमा, वरुण, इंद्र, भग, पूषा, विवस्वान)", keywords: ["जय सूर्य देव", "जय श्री सूर्य नारायण", "ओम सूर्याय नमः", "जय मित्र देव", "जय अर्यमा देव", "जय वरुण देव", "जय इंद्र देव", "जय पूषा देव", "jai surya dev", "om suryaya namah", "varun dev", "indra dev"] },
+  { display: "जय एकादश रुद्र (महेश्वर, पशुपति, पिनाकी, ईशान, कपाली, अजैकपाद)", keywords: ["जय महेश्वर", "जय पशुपति", "जय पिनाकी", "जय ईशान देव", "जय कपाली", "जय रुद्र देव", "jai maheshwar", "jai rudra dev", "pashupati"] },
+  { display: "जय अष्ट वसु (अग्नि देव, वायु देव, ध्रुव, सोम, धर, अनल, अनिल, प्रभास)", keywords: ["जय अग्नि देव", "जय वायु देव", "जय पवन देव", "जय ध्रुव देव", "जय सोम देव", "जय अष्ट वसु", "jai agni dev", "jai vayu dev", "pawan dev"] },
+  { display: "जय अश्विनी कुमार (नासत्य और दस्र - देव वैद्य)", keywords: ["जय अश्विनी कुमार", "जय नासत्य देव", "जय दस्र देव", "jai ashwini kumar"] },
 
-    <!-- Step 2: Subscription Plans & Razorpay Payment -->
-    <div id="paymentSection">
-        <div class="success-badge">
-            ✅ ऑथेंटिकेशन सफल! (राम / Ram)
-        </div>
-        <h2 style="text-align: center; margin-bottom: 15px;">अपना सब्सक्रिप्शन प्लान चुनें</h2>
+  // =========================================================================
+  // 7. नवग्रह देवगण एवं अन्य प्रमुख देव
+  // =========================================================================
+  { display: "जय श्री शनि देव / ॐ शं शनैश्चराय नमः", keywords: ["जय शनि देव", "जय श्री शनिदेव", "ओम शं शनैश्चराय नमः", "जय सूर्यपुत्र शनिदेव", "jai shani dev", "jai shanidev"] },
+  { display: "जय चंद्र देव / मंगल देव / बुध देव / बृहस्पति देव / शुक्र देव", keywords: ["जय चंद्र देव", "जय मंगल देव", "जय बुध देव", "जय बृहस्पति देव", "जय गुरु देव", "जय शुक्र देव", "jai chandra dev", "mangal dev", "brihaspati dev"] },
+  { display: "जय श्री विश्वकर्मा भगवान", keywords: ["जय श्री विश्वकर्मा", "जय विश्वकर्मा भगवान", "जय विश्वकर्मा जी", "jai shri vishwakarma", "jai vishwakarma"] },
+  { display: "जय श्री कुबेर जी / जय श्री चित्रगुप्त जी / जय यमराज जी", keywords: ["जय श्री कुबेर", "जय कुबेर जी", "जय श्री चित्रगुप्त", "जय धर्मराज", "jai kuber ji", "jai chitragupta"] },
+  { display: "जय श्री काल भैरव / जय बटुक भैरव नाथ", keywords: ["जय काल भैरव", "जय श्री भैरव नाथ", "जय बटुक भैरव", "jai kaal bhairav", "jai bhairav nath"] },
 
-        <div class="plan-card">
-            <div class="plan-info">
-                <h3>₹499 / महीना</h3>
-                <p>बेसिक सिक्योरिटी एक्सेस</p>
-            </div>
-            <button class="pay-btn" onclick="payNow(499, 'Basic Plan')">Pay ₹499</button>
-        </div>
+  // =========================================================================
+  // 8. लोक देवता, संत एवं कुलदेवता
+  // =========================================================================
+  { display: "जय बाबा रामदेव जी / जय तेजाजी / जय गोगाजी / जय पाबूजी", keywords: ["जय बाबा रामदेव", "जय रामदेव पीर", "जय तेजाजी महाराज", "जय गोगाजी महाराज", "जय पाबूजी", "जय देवनारायण भगवान", "jai baba ramdev", "jai tejaji", "jai gogaji", "devnarayan"] },
+  { display: "जय श्री गुरुदेव / जय कुलदेवता / जय पितृ देव", keywords: ["जय गुरुदेव", "जय श्री गुरुदेव", "जय कुलदेवता", "जय पितृ देव", "जय ग्राम देवता", "jai gurudev", "jai pitru dev", "jai kuldevta"] }
+];
 
-        <div class="plan-card">
-            <div class="plan-info">
-                <h3>₹999 / महीना</h3>
-                <p>स्टैंडर्ड बायोमेट्रिक सुरक्षा</p>
-            </div>
-            <button class="pay-btn" onclick="payNow(999, 'Standard Plan')">Pay ₹999</button>
-        </div>
+/**
+ * ============================================================================
+ * स्मार्ट वॉइस मैचिंग इंजन (Fuzzy & Tolerant Matching)
+ * यह उच्चारण में हल्की गलती (जैसे "श्री" vs "स्री", "जय" vs "जै") को भी समझता है
+ * ============================================================================
+ */
+function normalizeSpeechText(text) {
+  return text
+    .toLowerCase()
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()।?]/g, "")
+    .replace(/shree/g, "shri")
+    .replace(/jay/g, "jai")
+    .replace(/जै/g, "जय")
+    .replace(/स्री/g, "श्री")
+    .replace(/माताजी/g, "माता जी")
+    .replace(/भगवानजी/g, "भगवान जी")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-        <div class="plan-card">
-            <div class="plan-info">
-                <h3>₹1599 / महीना</h3>
-                <p>प्रो एडवांस्ड ट्रैकिंग</p>
-            </div>
-            <button class="pay-btn" onclick="payNow(1599, 'Pro Plan')">Pay ₹1599</button>
-        </div>
+function verifySanatanVoiceAuth(spokenText) {
+  if (!spokenText) return { isAuthenticated: false, matchedName: null };
 
-        <div class="plan-card">
-            <div class="plan-info">
-                <h3>₹3000 / महीना</h3>
-                <p>एंटरप्राइज हाई-सिक्योरिटी</p>
-            </div>
-            <button class="pay-btn" onclick="payNow(3000, 'Enterprise Plan')">Pay ₹3000</button>
-        </div>
-    </div>
-</div>
+  const cleanedSpeech = normalizeSpeechText(spokenText);
 
-<script>
-    const video = document.getElementById('videoFeed');
-    const cameraSelect = document.getElementById('cameraSelect');
-    const statusLog = document.getElementById('statusLog');
-    let currentStream = null;
+  for (const deity of SANATAN_VOICE_PASSWORDS) {
+    for (const keyword of deity.keywords) {
+      const cleanKeyword = normalizeSpeechText(keyword);
+      if (cleanedSpeech.includes(cleanKeyword)) {
+        return {
+          isAuthenticated: true,
+          matchedName: deity.display
+        };
+      }
+    }
+  }
 
-    // 1. कैमरे की लिस्ट लोड करें और चालू करें
-    async function initCameras() {
+  return { isAuthenticated: false, matchedName: null };
+}
+
+/**
+ * ============================================================================
+ * एकीकृत SpeechRecognition सेटअप (Integrated Voice Authentication Controller)
+ * ============================================================================
+ */
+function initSanatanVoiceAuthentication() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    console.error("इस ब्राउज़र में Speech Recognition सपोर्ट नहीं है। कृपया Chrome या Edge का उपयोग करें।");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "hi-IN"; // हिंदी और अंग्रेजी दोनों को सबसे सटीकता से पकड़ता है
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 5; // टॉप 5 संभावित शब्दों को चेक करेगा ताकि एरर न आए!
+
+  const statusElement = document.getElementById("auth-status"); // अपने HTML के स्टेटस div की ID यहाँ दें
+  const promptElement = document.getElementById("voice-prompt"); // जहाँ "Say / बोलें" लिखा है
+
+  if (promptElement) {
+    promptElement.innerText = "जय श्री राम / हर हर महादेव / जय माता दी (कोई भी जयकारा बोलें)";
+  }
+
+  recognition.onstart = () => {
+    if (statusElement) {
+      statusElement.innerText = "🎙️ सुन रहा हूँ... कृपया किसी भी देवी-देवता का जयकारा बोलें...";
+    }
+  };
+
+  recognition.onresult = (event) => {
+    let authResult = { isAuthenticated: false, matchedName: null };
+    let bestTranscript = event.results[0][0].transcript;
+
+    // सभी 5 संभावित उच्चारणों (Alternatives) को चेक करें ताकि एरर की गुंजाइश खत्म हो जाए
+    for (let i = 0; i < event.results[0].length; i++) {
+      const alternativeText = event.results[0][i].transcript;
+      const check = verifySanatanVoiceAuth(alternativeText);
+      if (check.isAuthenticated) {
+        authResult = check;
+        break;
+      }
+    }
+
+    if (authResult.isAuthenticated) {
+      // ✅ ऑथेंटिकेशन सफल!
+      if (statusElement) {
+        statusElement.innerHTML = `✅ ऑथेंटिकेशन सफल! (${authResult.matchedName})`;
+        statusElement.style.color = "green";
+      }
+      console.log("Authenticated with:", authResult.matchedName);
+
+      // यहाँ अपना सब्सक्रिप्शन प्लान दिखाने या डैशबोर्ड खोलने का फंक्शन कॉल करें:
+      // showSubscriptionPlans(); 
+    } else {
+      // ❌ यदि पहचान नहीं हो सकी तो दोबारा सुनने के लिए तैयार करें
+      if (statusElement) {
+        statusElement.innerHTML = `❌ सुना गया: "${bestTranscript}" — पहचान नहीं हो सकी। कृपया पुनः जयकारा बोलें...`;
+        statusElement.style.color = "red";
+      }
+      // 1.5 सेकंड बाद माइक अपने आप दोबारा चालू होगा (ताकि यूज़र को बार-बार बटन न दबाना पड़े)
+      setTimeout(() => {
         try {
-            await navigator.mediaDevices.getUserMedia({ video: true });
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
-            
-            cameraSelect.innerHTML = '';
-            videoDevices.forEach((device, index) => {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = device.label || `camera ${index + 1}`;
-                cameraSelect.appendChild(option);
-            });
-
-            if (videoDevices.length > 0) {
-                startCamera(videoDevices[0].deviceId);
-            }
-        } catch (err) {
-            statusLog.innerText = "कैमरा एक्सेस नहीं मिला: " + err.message;
-        }
+          recognition.start();
+        } catch (e) {}
+      }, 1500);
     }
+  };
 
-    async function startCamera(deviceId) {
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
-        }
+  recognition.onerror = (event) => {
+    console.warn("Voice Recognition Warning:", event.error);
+    if (event.error === "no-speech" || event.error === "aborted") {
+      // आवाज़ न आने पर दोबारा रीस्टार्ट करें
+      setTimeout(() => {
         try {
-            currentStream = await navigator.mediaDevices.getUserMedia({
-                video: { deviceId: deviceId ? { exact: deviceId } : undefined }
-            });
-            video.srcObject = currentStream;
-        } catch (err) {
-            console.error(err);
-        }
+          recognition.start();
+        } catch (e) {}
+      }, 1000);
+    } else if (statusElement) {
+      statusElement.innerText = `⚠️ माइक त्रुटि (${event.error})। कृपया माइक की अनुमति जांचें।`;
     }
+  };
 
-    cameraSelect.addEventListener('change', () => {
-        startCamera(cameraSelect.value);
-    });
+  // पेज लोड होते ही वॉइस ऑथेंटिकेशन शुरू करें
+  try {
+    recognition.start();
+  } catch (err) {
+    console.log("Recognition start waiting for user interaction:", err);
+  }
 
-    // पेज लोड होते ही कैमरा चालू करें
-    window.addEventListener('load', () => {
-        initCameras();
-    });
+  return recognition;
+}
 
-    // 2. वॉयस ऑथेंटिकेशन शुरू करें
-    function startVoiceAuth() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            statusLog.innerText = "आपका ब्राउज़र वॉयस रिकग्निशन सपोर्ट नहीं करता।";
-            return;
-        }
-
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'hi-IN';
-        recognition.interimResults = false;
-
-        statusLog.innerText = "सुन रहा है... कृपया 'राम' या 'Ram' बोलें...";
-
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript.trim().toLowerCase();
-            statusLog.innerText = "आपने कहा: " + transcript;
-
-            if (transcript.includes('राम') || transcript.includes('ram')) {
-                statusLog.innerText = "Ledger Log Updated: SUCCESS (राम / Ram)";
-                statusLog.style.color = "#4ade80";
-                
-                // 1 सेकंड बाद पेमेंट प्लान वाला सेक्शन दिखाएं
-                setTimeout(() => {
-                    document.getElementById('authSection').style.display = 'none';
-                    document.getElementById('paymentSection').style.display = 'block';
-                }, 1000);
-            } else {
-                statusLog.innerText = "आवाज़ मैच नहीं हुई। कृपया फिर से 'राम' बोलें।";
-                statusLog.style.color = "#f87171";
-            }
-        };
-
-        recognition.onerror = function(event) {
-            statusLog.innerText = "त्रुटि: " + event.error + " (माइक की अनुमति दें)";
-        };
-
-        recognition.start();
-    }
-
-    // 3. Razorpay पेमेंट विंडो खोलें
-    function payNow(amount, planName) {
-        var options = {
-            "key": "rzp_test_TzHOgP7cLQsw9P", // आपकी Razorpay Key ID
-            "amount": amount * 100, // रुपये को पैसे में बदलना
-            "currency": "INR",
-            "name": "Aura Crypt Security",
-            "description": planName,
-            "handler": function (response){
-                alert("पेमेंट सफल रहा! Payment ID: " + response.razorpay_payment_id);
-            },
-            "prefill": {
-                "name": "Ravindra Suthar",
-                "email": "sutharravindra999@gmail.com"
-            },
-            "theme": {
-                "color": "#0284c7"
-            }
-        };
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-    }
-</script>
-
-</body>
-</html>
+// पेज पूरी तरह लोड होने पर ऑटोमैटिक स्टार्ट करें
+window.addEventListener("DOMContentLoaded", () => {
+  initSanatanVoiceAuthentication();
+});
